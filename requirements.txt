@@ -6,3 +6,4 @@ numpy
 Pillow
 pydantic
 beautifulsoup4
+genshin
