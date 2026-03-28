@@ -168,14 +168,32 @@ class DataManager:
     def check_existing_files(self) -> bool:
         return all(os.path.exists(os.path.join(JSON_DIR, f.replace(".json", "_data.json"))) for f in JSON_FILES)
 
+async def get_medals(uid, cookies):
+    client = genshin.Client(random.choice(cookies))
+    data = await client.get_zzz_user(uid)
 
-async def fetch_user(uid: int, original: bool = False) -> ZenkaApi:
+    return [
+        {
+            "MedalIcon": medal.id,
+            "name": medal.name,
+            "Value": medal.number,
+            "MedalType": medal.type,
+            "icon": medal.icon,
+        }
+        for medal in data.in_game_data.medals
+    ]
+
+async def fetch_user(uid: int, original: bool = False, cookies: List[dict] = []) -> ZenkaApi:
     data = await AioSession.get(API_URL.format(uid = uid), response_format= "json")
     if data.get("message"):
         raise ZZZError(ErrorText().format_api(text = data.get("message")))
     
     if original:
         return data
+
+    # extract medals data from genshin 
+    medals = await get_medals(uid, cookies)
+    data["PlayerInfo"]["SocialDetail"]["MedalList"] = medals
     
     return ZenkaApi(jsons_data=jsons_data, lang=lang, **data["PlayerInfo"])
 

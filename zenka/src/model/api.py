@@ -241,7 +241,7 @@ class Medal(BaseModel):
     id: int = Field(alias="MedalIcon")
     name: str = None
     value: int = Field(alias="Value")
-    type: int = Field(alias="MedalType")
+    type: str = Field(alias="MedalType")
     icon: str = None
 
 class ProfileDetail(BaseModel):

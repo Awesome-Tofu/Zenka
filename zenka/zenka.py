@@ -21,12 +21,14 @@ class Client:
         self, lang: Union[Lang,str] = Lang.EN.value,
         character_art: Optional[Dict[Union[int,str], str]] = None,
         character_id: Optional[List[int]] = None,
-        config: Config = None
+        config: Config = None,
+        cookies: Optional[List[dict]] = None
     ):
         self.lang = lang.value if isinstance(lang, Lang) else lang
         self.character_art = character_art if character_art is not None else {}
         self.character_id = character_id if character_id is not None else []
         self.config = config if config is not None else Config()
+        self.cookies = cookies if cookies is not None else []
 
 
     async def __aenter__(self):
@@ -51,14 +53,14 @@ class Client:
         await http.AioSession.exit(exc_type, exc, tb)
 
     async def get_api(self, uid: Union[str,int], original: bool = False) -> api.ZenkaApi:
-        return  await api.fetch_user(uid, original)
+        return  await api.fetch_user(uid, original, cookies=self.cookies)
     
     async def update_asset(self) -> None:
         await api.DataManager().update_data()
 
     async def profile(self, uid: int, color: Tuple[int,int,int,int] = None) -> ZenkaGenerator:
         result = ZenkaGenerator()
-        data =  await api.fetch_user(uid)
+        data =  await api.fetch_user(uid, cookies=self.cookies)
         for key in data.character_info.characters:           
             result.charter_name.append(key.name)
             result.charter_id.append(key.id)
@@ -74,7 +76,7 @@ class Client:
     
     async def card(self, uid: int) -> ZenkaGenerator:
         result = ZenkaGenerator()
-        data =  await api.fetch_user(uid)
+        data =  await api.fetch_user(uid, cookies=self.cookies)
         task = []
         for key in data.character_info.characters:
             result.charter_name.append(key.name)
@@ -99,7 +101,7 @@ class Client:
     
     async def teams(self, uid: int) -> ZenkaGeneratorTeams:
         result = ZenkaGeneratorTeams()
-        data =  await api.fetch_user(uid)
+        data =  await api.fetch_user(uid, cookies=self.cookies)
         task = []
 
         for key in data.character_info.characters:
@@ -116,5 +118,3 @@ class Client:
                 save_file(key.id, key.card)
                 
         return result
-
-
