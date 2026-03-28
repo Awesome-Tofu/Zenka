@@ -7,6 +7,7 @@ from .http import AioSession
 from .error import ZZZError
 from ..model.base import Lang, HoyoAPIHeaders, ErrorText
 from ..model.api import CharacterDataHoYo, ZenkaApi
+import genshin, random
 
 API_URL = "https://enka.network/api/zzz/uid/{uid}"
 RAW_BASE_URL = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/zzz/"
